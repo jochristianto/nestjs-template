@@ -80,6 +80,7 @@ export class RefreshTokenCommandHandler implements ICommandHandler<RefreshTokenC
     return {
       accessToken,
       refreshToken: newRefreshToken,
+      userId: user.id.getValue(),
     };
   }
 }

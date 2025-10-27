@@ -1,4 +1,10 @@
-import { AuthResponse, LoginRequest } from '@application/dtos';
+import {
+  AuthResponse,
+  AuthTokenResponse,
+  EmailVerificationRequiredResponse,
+  LoginRequest,
+  OtpRequiredResponse,
+} from '@application/dtos';
 import { UserMapper } from '@application/mappers/user.mapper';
 import { IRoleRepository } from '@core/repositories/role.repository.interface';
 import { AuthService } from '@core/services/auth.service';
@@ -31,7 +37,7 @@ export class LoginCommandHandler implements ICommandHandler<LoginCommand> {
     this.logger.setContext(LoginCommandHandler.name);
   }
 
-  async execute(command: LoginCommand): Promise<AuthResponse> {
+  async execute(command: LoginCommand) {
     const { email } = command.loginDto;
 
     this.logger.log({ message: 'Login attempt', email });
@@ -68,7 +74,7 @@ export class LoginCommandHandler implements ICommandHandler<LoginCommand> {
         userId: user.id.getValue(),
         email: user.email.getValue(),
         message: this.i18n.t('common.auth.verification.email_sent'),
-      };
+      } satisfies EmailVerificationRequiredResponse;
     }
 
     // Check if OTP is enabled
@@ -83,7 +89,7 @@ export class LoginCommandHandler implements ICommandHandler<LoginCommand> {
         requiresOtp: true,
         userId: user.id.getValue(),
         message: this.i18n.t('common.auth.2fa.enabled'),
-      };
+      } satisfies OtpRequiredResponse;
     }
 
     // Collect all permissions from all user roles
@@ -121,7 +127,6 @@ export class LoginCommandHandler implements ICommandHandler<LoginCommand> {
       accessToken,
       refreshToken,
       user: UserMapper.toAuthResponse(user, true),
-      message: this.i18n.t('common.auth.login.success'),
-    };
+    } satisfies AuthTokenResponse;
   }
 }

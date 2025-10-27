@@ -1,9 +1,9 @@
-import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
-import { StorageService } from '@core/services/storage.service';
-import { FileMapper } from '../../mappers/file.mapper';
 import { FileResponse } from '@application/dtos';
+import { StorageService } from '@core/services/storage.service';
+import { IQueryHandler, Query, QueryHandler } from '@nestjs/cqrs';
+import { FileMapper } from '../../mappers/file.mapper';
 
-export interface IGetAllFilesResult {
+export interface IGetAllFilesResult extends Query<IGetAllFilesResult> {
   files: FileResponse[];
   total: number;
   page: number;
@@ -19,15 +19,13 @@ export class GetAllFilesQuery {
 }
 
 @QueryHandler(GetAllFilesQuery)
-export class GetAllFilesQueryHandler
-  implements IQueryHandler<GetAllFilesQuery, IGetAllFilesResult>
-{
+export class GetAllFilesQueryHandler implements IQueryHandler<GetAllFilesQuery> {
   constructor(
     private readonly storageService: StorageService,
     private readonly fileMapper: FileMapper,
   ) {}
 
-  async execute(query: GetAllFilesQuery): Promise<IGetAllFilesResult> {
+  async execute(query: GetAllFilesQuery) {
     const { page, limit } = query;
     const result = await this.storageService.getAllFiles(page, limit);
 

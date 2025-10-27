@@ -1,10 +1,10 @@
-import { IQuery, QueryHandler, IQueryHandler } from '@nestjs/cqrs';
-import { Injectable, Inject } from '@nestjs/common';
-import { IPermissionRepository } from '@core/repositories/permission.repository.interface';
-import { PERMISSION_REPOSITORY } from '@shared/constants/tokens';
 import { PermissionResponse } from '@application/dtos';
+import { IPermissionRepository } from '@core/repositories/permission.repository.interface';
+import { Inject, Injectable } from '@nestjs/common';
+import { IQueryHandler, Query, QueryHandler } from '@nestjs/cqrs';
+import { PERMISSION_REPOSITORY } from '@shared/constants/tokens';
 
-export class GetPermissionsQuery implements IQuery {}
+export class GetPermissionsQuery extends Query<PermissionResponse[]> {}
 
 @Injectable()
 @QueryHandler(GetPermissionsQuery)
@@ -14,7 +14,7 @@ export class GetPermissionsQueryHandler implements IQueryHandler<GetPermissionsQ
     private readonly permissionRepository: IPermissionRepository,
   ) {}
 
-  async execute(): Promise<PermissionResponse[]> {
+  async execute() {
     const permissions = await this.permissionRepository.findAll();
 
     return permissions.map(permission => PermissionResponse.fromEntity(permission));

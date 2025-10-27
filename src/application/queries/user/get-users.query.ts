@@ -1,8 +1,8 @@
-import { IQuery, IQueryHandler, QueryHandler } from '@nestjs/cqrs';
-import { Injectable, Inject } from '@nestjs/common';
-import { IUserRepository } from '@core/repositories/user.repository.interface';
 import { UserDetailResponse } from '@application/dtos';
 import { UserMapper } from '@application/mappers/user.mapper';
+import { IUserRepository } from '@core/repositories/user.repository.interface';
+import { Inject, Injectable } from '@nestjs/common';
+import { IQueryHandler, Query, QueryHandler } from '@nestjs/cqrs';
 import { USER_REPOSITORY } from '@shared/constants/tokens';
 
 export interface IGetUsersResult {
@@ -13,23 +13,25 @@ export interface IGetUsersResult {
   totalPages: number;
 }
 
-export class GetUsersQuery implements IQuery {
+export class GetUsersQuery extends Query<IGetUsersResult> {
   constructor(
     public readonly search?: string,
     public readonly page: number = 1,
     public readonly limit: number = 20,
-  ) {}
+  ) {
+    super();
+  }
 }
 
 @Injectable()
 @QueryHandler(GetUsersQuery)
-export class GetUsersQueryHandler implements IQueryHandler<GetUsersQuery, IGetUsersResult> {
+export class GetUsersQueryHandler implements IQueryHandler<GetUsersQuery> {
   constructor(
     @Inject(USER_REPOSITORY)
     private readonly userRepository: IUserRepository,
   ) {}
 
-  async execute(query: GetUsersQuery): Promise<IGetUsersResult> {
+  async execute(query: GetUsersQuery) {
     const { search, page, limit } = query;
     const offset = (page - 1) * limit;
 

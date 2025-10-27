@@ -1,12 +1,14 @@
-import { IQuery, QueryHandler, IQueryHandler } from '@nestjs/cqrs';
-import { Injectable, Inject } from '@nestjs/common';
-import { UserService } from '@core/services/user.service';
-import { LoggerService } from '@infrastructure/logger/logger.service';
 import { UserDetailResponse } from '@application/dtos';
 import { UserMapper } from '@application/mappers/user.mapper';
+import { UserService } from '@core/services/user.service';
+import { LoggerService } from '@infrastructure/logger/logger.service';
+import { Inject, Injectable } from '@nestjs/common';
+import { IQueryHandler, Query, QueryHandler } from '@nestjs/cqrs';
 
-export class AdminGetUserQuery implements IQuery {
-  constructor(public readonly userId: string) {}
+export class AdminGetUserQuery extends Query<UserDetailResponse> {
+  constructor(public readonly userId: string) {
+    super();
+  }
 }
 
 @Injectable()
@@ -19,7 +21,7 @@ export class AdminGetUserQueryHandler implements IQueryHandler<AdminGetUserQuery
     this.logger.setContext(AdminGetUserQueryHandler.name);
   }
 
-  async execute(query: AdminGetUserQuery): Promise<UserDetailResponse> {
+  async execute(query: AdminGetUserQuery) {
     const { userId } = query;
 
     this.logger.log({

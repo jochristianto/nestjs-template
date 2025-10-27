@@ -1,13 +1,15 @@
-import { IQuery, IQueryHandler, QueryHandler } from '@nestjs/cqrs';
-import { Inject } from '@nestjs/common';
-import { IRoleRepository } from '@core/repositories/role.repository.interface';
 import { RoleDetailResponse } from '@application/dtos';
-import { EntityNotFoundException } from '@core/exceptions/domain-exceptions';
 import { RoleMapper } from '@application/mappers/role.mapper';
+import { EntityNotFoundException } from '@core/exceptions/domain-exceptions';
+import { IRoleRepository } from '@core/repositories/role.repository.interface';
+import { Inject } from '@nestjs/common';
+import { IQueryHandler, Query, QueryHandler } from '@nestjs/cqrs';
 import { ROLE_REPOSITORY } from '@shared/constants/tokens';
 
-export class GetRoleQuery implements IQuery {
-  constructor(public readonly id: string) {}
+export class GetRoleQuery extends Query<RoleDetailResponse> {
+  constructor(public readonly id: string) {
+    super();
+  }
 }
 
 @QueryHandler(GetRoleQuery)
@@ -17,7 +19,7 @@ export class GetRoleQueryHandler implements IQueryHandler<GetRoleQuery> {
     private readonly roleRepository: IRoleRepository,
   ) {}
 
-  async execute(query: GetRoleQuery): Promise<RoleDetailResponse> {
+  async execute(query: GetRoleQuery) {
     const { id } = query;
     const role = await this.roleRepository.findById(id);
 

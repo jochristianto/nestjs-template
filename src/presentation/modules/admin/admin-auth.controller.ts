@@ -1,22 +1,22 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, Inject } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Body, Controller, HttpCode, HttpStatus, Inject, Post } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 // Guards & Decorators
-import { Public } from '@shared/decorators/public.decorator';
 import { CurrentUser } from '@shared/decorators/current-user.decorator';
+import { Public } from '@shared/decorators/public.decorator';
 
 // DTOs
-import { LoginRequest, RefreshTokenRequest, IJwtPayload } from '@application/dtos';
+import { IJwtPayload, LoginRequest, RefreshTokenRequest } from '@application/dtos';
 
 // Commands
 import { LoginCommand } from '@application/commands/auth/login.command';
-import { RefreshTokenCommand } from '@application/commands/auth/refresh-token.command';
 import { LogoutCommand } from '@application/commands/auth/logout.command';
+import { RefreshTokenCommand } from '@application/commands/auth/refresh-token.command';
 
 // Services
-import { UserAuthorizationService } from '@core/services/user-authorization.service';
 import { IUserRepository } from '@core/repositories/user.repository.interface';
+import { UserAuthorizationService } from '@core/services/user-authorization.service';
 import { USER_REPOSITORY } from '@shared/constants/tokens';
 
 @ApiTags('admin-auth')
@@ -74,8 +74,8 @@ export class AdminAuthController {
     const refreshResult = await this.commandBus.execute(new RefreshTokenCommand(refreshTokenDto));
 
     // Re-validate admin privileges on token refresh
-    if ('user' in refreshResult) {
-      const userEntity = await this.userRepository.findById(refreshResult.user.id);
+    if (refreshResult.userId) {
+      const userEntity = await this.userRepository.findById(refreshResult.userId);
       if (!userEntity || !this.userAuthorizationService.canAccessAdminFeatures(userEntity)) {
         return {
           success: false,

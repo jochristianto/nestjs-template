@@ -1,12 +1,14 @@
-import { IQuery, IQueryHandler, QueryHandler } from '@nestjs/cqrs';
-import { NotFoundException, Injectable, Inject } from '@nestjs/common';
-import { IUserRepository } from '@core/repositories/user.repository.interface';
 import { UserDetailResponse } from '@application/dtos';
 import { UserMapper } from '@application/mappers/user.mapper';
+import { IUserRepository } from '@core/repositories/user.repository.interface';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { IQueryHandler, Query, QueryHandler } from '@nestjs/cqrs';
 import { USER_REPOSITORY } from '@shared/constants/tokens';
 
-export class GetUserQuery implements IQuery {
-  constructor(public readonly userId: string) {}
+export class GetUserQuery extends Query<UserDetailResponse> {
+  constructor(public readonly userId: string) {
+    super();
+  }
 }
 
 @Injectable()
@@ -17,7 +19,7 @@ export class GetUserQueryHandler implements IQueryHandler<GetUserQuery> {
     private readonly userRepository: IUserRepository,
   ) {}
 
-  async execute(query: GetUserQuery): Promise<UserDetailResponse> {
+  async execute(query: GetUserQuery) {
     const { userId } = query;
 
     const user = await this.userRepository.findById(userId);
