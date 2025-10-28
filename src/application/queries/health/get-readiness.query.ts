@@ -1,16 +1,16 @@
-import { IQuery, IQueryHandler, QueryHandler } from '@nestjs/cqrs';
-import { Injectable } from '@nestjs/common';
 import { ReadinessResponse } from '@application/dtos';
 import { HealthService } from '@core/services/health.service';
+import { Injectable } from '@nestjs/common';
+import { IQueryHandler, Query, QueryHandler } from '@nestjs/cqrs';
 
-export class GetReadinessQuery implements IQuery {}
+export class GetReadinessQuery extends Query<ReadinessResponse> {}
 
 @Injectable()
 @QueryHandler(GetReadinessQuery)
 export class GetReadinessQueryHandler implements IQueryHandler<GetReadinessQuery> {
   constructor(private readonly healthService: HealthService) {}
 
-  async execute(): Promise<ReadinessResponse> {
+  async execute() {
     return this.healthService.getReadiness();
   }
 }

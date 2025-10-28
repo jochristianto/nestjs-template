@@ -1,16 +1,16 @@
-import { IQuery, IQueryHandler, QueryHandler } from '@nestjs/cqrs';
-import { Injectable } from '@nestjs/common';
 import { DatabaseHealthResponse } from '@application/dtos';
 import { HealthService } from '@core/services/health.service';
+import { Injectable } from '@nestjs/common';
+import { IQueryHandler, Query, QueryHandler } from '@nestjs/cqrs';
 
-export class GetDatabaseHealthQuery implements IQuery {}
+export class GetDatabaseHealthQuery extends Query<DatabaseHealthResponse> {}
 
 @Injectable()
 @QueryHandler(GetDatabaseHealthQuery)
 export class GetDatabaseHealthQueryHandler implements IQueryHandler<GetDatabaseHealthQuery> {
   constructor(private readonly healthService: HealthService) {}
 
-  async execute(): Promise<DatabaseHealthResponse> {
+  async execute() {
     return this.healthService.getDatabaseHealth();
   }
 }

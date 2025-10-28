@@ -1,17 +1,25 @@
-import { ICommand, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { LoginRequest, AuthResponse } from '@application/dtos';
-import { UnauthorizedException, Injectable, Inject } from '@nestjs/common';
-import { UserService } from '@core/services/user.service';
-import { AuthService } from '@core/services/auth.service';
-import { IRoleRepository } from '@core/repositories/role.repository.interface';
-import { TokenProvider } from '@presentation/modules/auth/providers/token.provider';
+import {
+  AuthResponse,
+  AuthTokenResponse,
+  EmailVerificationRequiredResponse,
+  LoginRequest,
+  OtpRequiredResponse,
+} from '@application/dtos';
 import { UserMapper } from '@application/mappers/user.mapper';
-import { I18nService } from 'nestjs-i18n';
-import { ROLE_REPOSITORY } from '@shared/constants/tokens';
+import { IRoleRepository } from '@core/repositories/role.repository.interface';
+import { AuthService } from '@core/services/auth.service';
+import { UserService } from '@core/services/user.service';
 import { LoggerService } from '@infrastructure/logger/logger.service';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import { Command, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { TokenProvider } from '@presentation/modules/auth/providers/token.provider';
+import { ROLE_REPOSITORY } from '@shared/constants/tokens';
+import { I18nService } from 'nestjs-i18n';
 
-export class LoginCommand implements ICommand {
-  constructor(public readonly loginDto: LoginRequest) {}
+export class LoginCommand extends Command<AuthResponse> {
+  constructor(public readonly loginDto: LoginRequest) {
+    super();
+  }
 }
 
 @Injectable()
@@ -29,7 +37,7 @@ export class LoginCommandHandler implements ICommandHandler<LoginCommand> {
     this.logger.setContext(LoginCommandHandler.name);
   }
 
-  async execute(command: LoginCommand): Promise<AuthResponse> {
+  async execute(command: LoginCommand) {
     const { email } = command.loginDto;
 
     this.logger.log({ message: 'Login attempt', email });
@@ -66,7 +74,7 @@ export class LoginCommandHandler implements ICommandHandler<LoginCommand> {
         userId: user.id.getValue(),
         email: user.email.getValue(),
         message: this.i18n.t('common.auth.verification.email_sent'),
-      };
+      } satisfies EmailVerificationRequiredResponse;
     }
 
     // Check if OTP is enabled
@@ -81,7 +89,7 @@ export class LoginCommandHandler implements ICommandHandler<LoginCommand> {
         requiresOtp: true,
         userId: user.id.getValue(),
         message: this.i18n.t('common.auth.2fa.enabled'),
-      };
+      } satisfies OtpRequiredResponse;
     }
 
     // Collect all permissions from all user roles
@@ -119,7 +127,6 @@ export class LoginCommandHandler implements ICommandHandler<LoginCommand> {
       accessToken,
       refreshToken,
       user: UserMapper.toAuthResponse(user, true),
-      message: this.i18n.t('common.auth.login.success'),
-    };
+    } satisfies AuthTokenResponse;
   }
 }
