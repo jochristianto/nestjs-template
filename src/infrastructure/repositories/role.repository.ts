@@ -73,7 +73,7 @@ export class RoleRepository extends BaseRepository<Role> implements IRoleReposit
       },
     });
 
-    return roleRecords.map(record => this.mapToModel(record as RoleWithPermissions));
+    return roleRecords.map((record) => this.mapToModel(record as RoleWithPermissions));
   }
 
   async findDefaultRole(): Promise<Role | null> {
@@ -104,7 +104,7 @@ export class RoleRepository extends BaseRepository<Role> implements IRoleReposit
         isDefault: role.isDefault,
         permissions: {
           create:
-            role.permissions?.map(permission => ({
+            role.permissions?.map((permission) => ({
               permission: {
                 connect: { id: permission.id.getValue() },
               },
@@ -140,7 +140,7 @@ export class RoleRepository extends BaseRepository<Role> implements IRoleReposit
         isDefault: role.isDefault,
         permissions: {
           create:
-            role.permissions?.map(permission => ({
+            role.permissions?.map((permission) => ({
               permission: {
                 connect: { id: permission.id.getValue() },
               },
@@ -174,14 +174,11 @@ export class RoleRepository extends BaseRepository<Role> implements IRoleReposit
   private mapToModel(record: RoleWithPermissions): Role {
     // Map permissions first
     const permissions =
-      record.permissions?.map(permissionRelation => {
+      record.permissions?.map((permissionRelation) => {
         const permissionRecord = permissionRelation.permission;
 
         // Create ResourceAction value object
-        const resourceAction = new ResourceAction(
-          permissionRecord.resource,
-          permissionRecord.action as ActionType,
-        );
+        const resourceAction = new ResourceAction(permissionRecord.resource, permissionRecord.action as ActionType);
 
         return Permission.fromData({
           id: permissionRecord.id,

@@ -109,7 +109,7 @@ export class UserRepository extends BaseRepository<User> implements IUserReposit
         },
       });
 
-      return userRecords.map(record => this.mapToModel(record as UserWithRelations));
+      return userRecords.map((record) => this.mapToModel(record as UserWithRelations));
     });
   }
 
@@ -158,7 +158,7 @@ export class UserRepository extends BaseRepository<User> implements IUserReposit
         orderBy: { createdAt: 'desc' },
       });
 
-      const users = userRecords.map(record => this.mapToModel(record as UserWithRelations));
+      const users = userRecords.map((record) => this.mapToModel(record as UserWithRelations));
 
       return { users, total };
     });
@@ -191,7 +191,7 @@ export class UserRepository extends BaseRepository<User> implements IUserReposit
         },
       });
 
-      return userRecords.map(record => this.mapToModel(record as UserWithRelations));
+      return userRecords.map((record) => this.mapToModel(record as UserWithRelations));
     });
   }
 
@@ -209,7 +209,7 @@ export class UserRepository extends BaseRepository<User> implements IUserReposit
           otpSecret: user.otpSecret,
           lastLoginAt: user.lastLoginAt,
           roles: {
-            create: user.roles.map(role => ({
+            create: user.roles.map((role) => ({
               role: {
                 connect: { id: role.id.getValue() },
               },
@@ -259,7 +259,7 @@ export class UserRepository extends BaseRepository<User> implements IUserReposit
           otpSecret: user.otpSecret,
           lastLoginAt: user.lastLoginAt,
           roles: {
-            create: user.roles.map(role => ({
+            create: user.roles.map((role) => ({
               role: {
                 connect: { id: role.id.getValue() },
               },
@@ -303,19 +303,16 @@ export class UserRepository extends BaseRepository<User> implements IUserReposit
 
   private mapToModel(record: UserWithRelations): User {
     // Map roles first
-    const roles = record.roles.map(roleRelation => {
+    const roles = record.roles.map((roleRelation) => {
       const roleRecord = roleRelation.role;
 
       // Map permissions
       const permissions =
-        roleRecord.permissions?.map(permissionRelation => {
+        roleRecord.permissions?.map((permissionRelation) => {
           const permissionRecord = permissionRelation.permission;
 
           // Create the ResourceAction value object
-          const resourceAction = new ResourceAction(
-            permissionRecord.resource,
-            permissionRecord.action as ActionType,
-          );
+          const resourceAction = new ResourceAction(permissionRecord.resource, permissionRecord.action as ActionType);
 
           return Permission.fromData({
             id: permissionRecord.id,

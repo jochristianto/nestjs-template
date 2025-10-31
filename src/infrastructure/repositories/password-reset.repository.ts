@@ -9,10 +9,7 @@ import { Injectable } from '@nestjs/common';
 import { BaseRepository } from './base.repository';
 
 @Injectable()
-export class PasswordResetRepository
-  extends BaseRepository<PasswordReset>
-  implements IPasswordResetRepository
-{
+export class PasswordResetRepository extends BaseRepository<PasswordReset> implements IPasswordResetRepository {
   constructor(private readonly prisma: PrismaService) {
     super();
   }
