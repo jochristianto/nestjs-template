@@ -21,7 +21,7 @@ export const VerifyEmail: React.FC = () => {
     setLoading(true);
     verifyEmail(
       {
-        url: `/auth/email-verification/verify`,
+        url: `/auth/email/verify`,
         method: 'post',
         values: {
           email: email || values.email,
@@ -65,7 +65,7 @@ export const VerifyEmail: React.FC = () => {
     setResendLoading(true);
     resendEmail(
       {
-        url: `/auth/email-verification/send`,
+        url: `/auth/email/send-verification`,
         method: 'post',
         values: { email },
       },

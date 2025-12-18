@@ -1,7 +1,11 @@
+import { config } from 'dotenv';
 import { PrismaClient } from '@generated/prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import * as bcrypt from 'bcrypt';
 import { ActionType, ResourceType } from '../src/core/value-objects/resource-action.vo';
+
+// Load .env file
+config();
 
 // Roles
 const roles = [
@@ -239,7 +243,7 @@ async function main() {
 }
 
 main()
-  .catch(e => {
+  .catch((e) => {
     console.error(e);
     process.exit(1);
   })
